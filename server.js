@@ -97,11 +97,9 @@ async function fetchAvailableProducts() {
 function getProductSuggestionsByQuery(userQuery, products) {
     const text = userQuery.toLowerCase();
     
-    // Extract numerical target price (e.g., "200", "under 300 pesos", "below ₱500")
     const priceMatch = text.match(/(\d+)\s*(pesos|php|₱)?/i);
     const targetPrice = priceMatch ? parseFloat(priceMatch[1]) : null;
 
-    // Standard product category keyword mappings
     const CATEGORIES = {
         apparel: ['shirt', 'tshirt', 't-shirt', 'hoodie', 'jacket', 'cap', 'hat', 'clothes', 'wear', 'apparel'],
         stationery: ['pen', 'ballpen', 'notebook', 'paper', 'pencil', 'pad', 'stationery', 'supplies', 'school'],
@@ -112,7 +110,6 @@ function getProductSuggestionsByQuery(userQuery, products) {
 
     let filtered = products;
 
-    // 1. Category Search
     let matchedCategoryItems = [];
     for (const [category, keywords] of Object.entries(CATEGORIES)) {
         if (keywords.some(kw => text.includes(kw))) {
@@ -127,7 +124,6 @@ function getProductSuggestionsByQuery(userQuery, products) {
         filtered = Array.from(new Set(matchedCategoryItems));
     }
 
-    // 2. Budget Filtering
     if (targetPrice) {
         if (text.includes('under') || text.includes('below') || text.includes('less than')) {
             const underItems = filtered.filter(p => p.price <= targetPrice);
@@ -138,11 +134,11 @@ function getProductSuggestionsByQuery(userQuery, products) {
         }
     }
 
-    // 3. STRICTLY limit to top 3 items (prevents customer overload)
     const topThree = filtered.slice(0, 3);
 
-    // 4. Correct syntax: Uses \({p.name} and\){p.price} instead of escaped parenthesis
-    return topThree.map(p => `- **\({p.name}**: ₱\){p.price}`).join('\n');
+    return topThree.map(function(p) {
+        return "- **" + p.name + "**: ₱" + p.price;
+    }).join("\n");
 }
 
 async function generateContentWithFallback(message, systemInstruction) {
@@ -267,7 +263,9 @@ app.post('/api/chat', async (req, res) => {
             });
         }
 
-        const dynamicCatalog = dbProducts.slice(0, 5).map(p => `- **\({p.name}**: ₱\){p.price}`).join('\n');
+        const dynamicCatalog = dbProducts.slice(0, 5).map(function(p) {
+            return "- **" + p.name + "**: ₱" + p.price;
+        }).join("\n");
         
         const systemInstruction = `CRITICAL ASSISTANT BOUNDARY:
 You are strictly an e-commerce assistant for Siel Cart. You DO NOT answer math, coding, trivia, or off-topic queries.
