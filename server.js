@@ -41,7 +41,7 @@ const FALLBACK_MODELS = [
 
 const STANDARD_REFUSAL = "I can only assist with Siel Cart FAQs (how to order, returns/refunds, data handling), product recommendations, and order status inquiries. How may I help you today?";
 
-const FRIENDLY_ERROR_MESSAGE = "Our assistant is temporarily unavailable. Please browse our catalog on the store page or contact the UBAP Office directly for immediate assistance.";
+const FRIENDLY_ERROR_MESSAGE = "Our assistant is temporarily unavailable. Please browse our catalog on the store page orr contact the UBAP Office directly for immediate assistance.";
 
 /**
  * Static store facts context provided to LLM
