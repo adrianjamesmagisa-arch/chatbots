@@ -184,9 +184,11 @@ app.post('/api/chat', async (req, res) => {
 
         const msgLower = message.toLowerCase();
 
-        // --- DIRECT INTERCEPTORS FOR CORE FAQ QUESTIONS ---
+        // ==========================================
+        // DIRECT INTERCEPTORS FOR PREDICTABLE FAQS
+        // ==========================================
         
-        // 1. Order Status
+        // 1. Order Status Check
         if (msgLower.includes('order status') || msgLower.includes('check my order') || msgLower.includes('track')) {
             return res.json({
                 response: `To check your order status:
@@ -197,17 +199,7 @@ app.post('/api/chat', async (req, res) => {
             });
         }
 
-        // 2. Return & Refund Policy
-        if (msgLower.includes('return') || msgLower.includes('refund') || msgLower.includes('exchange')) {
-            return res.json({
-                response: `For returns, refunds, or defective items:
-
-- Requests cannot be submitted online.
-- Contact the **UBAP Office** directly via email or in person with your claim receipt.`
-            });
-        }
-
-        // 3. How to Order
+        // 2. How to Place an Order
         if (msgLower.includes('how to order') || msgLower.includes('how do i order') || msgLower.includes('place an order') || msgLower.includes('how do i place an order')) {
             return res.json({
                 response: `To place an order:
@@ -220,21 +212,43 @@ app.post('/api/chat', async (req, res) => {
             });
         }
 
-        // 4. Data Privacy & Terms
+        // 3. Return & Refund Policy
+        if (msgLower.includes('return') || msgLower.includes('refund') || msgLower.includes('exchange')) {
+            return res.json({
+                response: `For returns, refunds, or defective items:
+
+- Requests cannot be submitted on the website.
+- Contact the **UBAP Office** directly via email or in person with your claim receipt.`
+            });
+        }
+
+        // 4. Pickup Location & Schedule
+        if (msgLower.includes('where') && msgLower.includes('pick up') || msgLower.includes('pickup location')) {
+            return res.json({
+                response: `Pickup details for Siel Cart:
+
+- **Location:** UBAP Office, Central Luzon State University.
+- **Payment:** Cash on Pickup only.
+- Present your **Claim Number** during your assigned date and time slot.`
+            });
+        }
+
+        // 5. Data Privacy & Terms
         if (msgLower.includes('privacy') || msgLower.includes('data') || msgLower.includes('collect data') || msgLower.includes('terms')) {
             return res.json({
-                response: `For questions about data privacy or terms:
+                response: `For details on how we collect and manage data:
 
-- Read our full [Privacy Policy](/privacy-policy)
+- View our full [Privacy Policy](/privacy-policy)
 - View our [Terms & Conditions](/terms-and-conditions)`
             });
         }
 
-        // Filter irrelevant queries
+        // Filter out completely off-topic queries
         if (isIrrelevantQuery(message)) {
             return res.json({ response: STANDARD_REFUSAL });
         }
 
+        // Fetch DB products
         let dbProducts = [];
         try {
             dbProducts = await fetchAvailableProducts();
@@ -287,7 +301,7 @@ app.post('/api/chat', async (req, res) => {
             const matchedList = getProductSuggestionsByQuery(message, dbProducts);
             
             return res.json({ 
-                response: `Here are 3 product recommendations matching your request:\n\n` + matchedList
+                response: "Here are 3 product recommendations matching your request:\n\n" + matchedList
             });
         }
 
@@ -302,8 +316,9 @@ LANGUAGE RULE:
 Respond ONLY in English at all times.
 
 STRICT LENGTH & FORMATTING RULES:
-- Keep answers ultra-short (3 bullet points max).
-- DO NOT add extra commentary or closing questions.
+- Output ONLY short answers (3 bullet points max).
+- Use bold text for key details.
+- DO NOT add extra commentary or closing questions like "Is there anything else I can help you with?".
 
 AVAILABLE PRODUCT CATALOG IN OUR SHOP:
 ${dynamicCatalog}
