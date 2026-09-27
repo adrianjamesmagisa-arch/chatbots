@@ -68,10 +68,20 @@ RETURNS & PRIVACY:
 function isIrrelevantQuery(text) {
     const query = text.trim().toLowerCase();
 
-    const GREETINGS = ['hi', 'hello', 'halu', 'hey', 'good morning', 'good afternoon', 'good evening', 'kumusta', 'yo'];
-    if (GREETINGS.some(g => query === g || query.startsWith(g + ' '))) {
-        return false;
-    }
+    // Quick Interceptor for Greetings
+const GREETINGS = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening', 'kumusta', 'yo'];
+if (GREETINGS.some(g => msgLower === g || msgLower === g + '!')) {
+    return res.json({
+        response: "Hello! Welcome to Siel Cart. How can I help you today?"
+    });
+}
+
+// Quick Interceptor for Payment Methods
+if (msgLower.includes('payment') || msgLower.includes('pay')) {
+    return res.json({
+        response: "Payment at Siel Cart is **Cash on Pickup only**, paid in person at the UBAP Office when receiving your items. We do not accept online payments or credit/debit cards."
+    });
+}
 
     const mathPattern = /^(\d+[\s\+\-\*\/\^%\=]+\d+|\b(what is|calculate|compute|solve)\b.*?\d+)/i;
     if (mathPattern.test(query)) return true;
